@@ -14,19 +14,56 @@ Not measured yet.
 
 ## Baseline defects found
 
-| #   | Defect                                                     | Where                                 | Status                                                                             |
-| --- | ---------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
-| 1   | Bulk updates exceeded the 50-id API cap                    | `src/App.tsx`                         | Fixed: chunked requests                                                            |
-| 2   | Search races allowed stale responses to win                | `src/features/assets/useAssets.ts`    | Fixed: 280ms debounce, aborts, query-scoped state                                  |
-| 3   | Reads and writes had no retry or Retry-After handling      | `src/api/client.ts`                   | Fixed: four attempts, exponential jitter, Retry-After                              |
-| 4   | API errors were flattened into raw strings                 | `src/api/client.ts`                   | Fixed: structured `ApiError`                                                       |
-| 5   | Only the first page was loaded                             | `src/features/assets/useAssets.ts`    | Fixed: cursor pagination                                                           |
-| 6   | All loaded cards rendered and selection touched every card | `src/features/assets/AssetGrid.tsx`   | Fixed: bounded window and memoized cards                                           |
-| 7   | Filters were not shareable or reloadable                   | `src/App.tsx`                         | Fixed: URL query state with replaceState                                           |
-| 8   | Grid keyboard semantics were absent                        | `src/features/assets/AssetGrid.tsx`   | Fixed: roving tabindex, arrows, Enter, Space, Shift range, labels                  |
-| 9   | Missing thumbnails showed broken image behavior            | `src/features/assets/AssetGrid.tsx`   | Fixed: stable placeholder and lazy loading                                         |
-| 10  | Bulk partial results were treated as all-or-nothing        | `src/App.tsx`                         | Fixed: optimistic updates, per-item rollback, exact failure list, retryable subset |
-| 11  | Detail version conflicts were unexplained                  | `src/features/assets/AssetDetail.tsx` | Fixed: actionable conflict message                                                 |
+# Defect
+
+Where  
+Status
+
+|---------------------------------------------------------------------------------- |
+
+1 Bulk updates exceeded the 50-id API cap  
+`src/App.tsx`  
+Fixed: chunked requests
+
+2 Search races allowed stale responses to win  
+`src/features/assets/useAssets.ts`  
+Fixed: 280ms debounce, aborts, query-scoped state
+
+3 Reads and writes had no retry or Retry-After handling  
+`src/api/client.ts`  
+Fixed: four attempts, exponential jitter, Retry-After
+
+4 API errors were flattened into raw strings  
+`src/api/client.ts`  
+Fixed: structured `ApiError`
+
+5 Only the first page was loaded
+`src/features/assets/useAssets.ts`  
+Fixed: cursor pagination
+
+6 All loaded cards rendered and selection touched every card
+`src/features/assets/AssetGrid.tsx`  
+Fixed: bounded window and memoized cards
+
+7 Filters were not shareable or reloadable  
+`src/App.tsx`
+Fixed: URL query state with replaceState
+
+8 Grid keyboard semantics were absent  
+`src/features/assets/AssetGrid.tsx`  
+Fixed: roving tabindex, arrows, Enter, Space, Shift range, labels
+
+9 Missing thumbnails showed broken image behavior  
+`src/features/assets/AssetGrid.tsx`  
+Fixed: stable placeholder and lazy loading
+
+10 Bulk partial results were treated as all-or-nothing  
+ `src/App.tsx`  
+ Fixed: optimistic updates, per-item rollback, exact failure list, retryable subset
+
+11 Detail version conflicts were unexplained  
+ `src/features/assets/AssetDetail.tsx`
+Fixed: actionable conflict message
 
 ## Key decisions
 
@@ -44,13 +81,36 @@ Not measured yet.
 
 ## Performance
 
-| Metric                                        | Before                       | After                                                               | How measured                                                               |
-| --------------------------------------------- | ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Rendered DOM nodes at 5,000 rows loaded       | Not measured                 | 6 visible cards in browser smoke test                               | Playwright snapshot while 100 assets loaded; full 5,000 run still required |
-| Cards re-rendered when toggling one selection | All loaded cards in baseline | Memoized cards isolate unchanged cards                              | Code inspection; React Profiler still required                             |
-| Longest task during sustained scroll          | Not measured                 | Not measured                                                        | Browser profiling still required                                           |
-| Requests while typing a 6-character query     | Up to 6                      | One after 280ms quiet time, plus retry traffic if transient failure | Code policy                                                                |
-| Production bundle, gzipped                    | 48 kB stated in brief        | 51.78 kB JS gzip                                                    | `npm run build`, Vite 5.4.21                                               |
+Metric  
+Before  
+After  
+How measured
+
+|-------------------------------------------------------------------------- |
+Rendered DOM nodes at 5,000 rows loaded  
+Not measured  
+6 visible cards in browser smoke test  
+Playwright snapshot while 100 assets loaded; full 5,000 run still required
+
+Cards re-rendered when toggling one selection
+All loaded cards in baseline
+Memoized cards isolate unchanged cards  
+Code inspection; React Profiler still required
+
+Longest task during sustained scroll  
+Not measured  
+Not measured  
+Browser profiling still required
+
+Requests while typing a 6-character query  
+Up to 6  
+One after 280ms quiet time, plus retry traffic if transient failure
+Code policy
+
+Production bundle, gzipped  
+48 kB stated in brief  
+51.78 kB JS gzip  
+`npm run build`, Vite 5.4.21
 
 ## Accessibility
 
