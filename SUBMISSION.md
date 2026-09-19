@@ -2,7 +2,8 @@
 
 ## Video walkthrough
 
-Video: not recorded yet.
+Drive URL :
+https://drive.google.com/drive/folders/1UXKv2CzOYN8rtrNY7sncPRlCASDcmMFd?usp=sharing
 
 ## How to run it
 
