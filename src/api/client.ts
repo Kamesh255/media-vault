@@ -1,5 +1,11 @@
 import type { Asset, AssetPage, AssetQuery, BulkResult } from "@/lib/types";
 
+const API_BASE = import.meta.env.DEV ? "/api" : (import.meta.env.VITE_API_BASE_URL ?? "https://media-vault-gmuv.onrender.com");
+
+function withBase(path: string): string {
+  return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -66,20 +72,20 @@ function delay(ms: number): Promise<void> {
 }
 
 export function listAssets(query: AssetQuery, signal?: AbortSignal): Promise<AssetPage> {
-  return request<AssetPage>(`/api/assets?${toSearchParams(query)}`, { signal });
+  return request<AssetPage>(withBase(`/assets?${toSearchParams(query)}`), { signal });
 }
 
 export function getAsset(id: string, signal?: AbortSignal): Promise<Asset> {
-  return request<Asset>(`/api/assets/${id}`, { signal });
+  return request<Asset>(withBase(`/assets/${id}`), { signal });
 }
 
 export function getAssetsByIds(ids: string[]): Promise<{ items: Asset[]; missing: string[] }> {
   // Note: the endpoint rejects more than 25 ids per call.
-  return request(`/api/assets/batch?ids=${ids.join(",")}`);
+  return request(withBase(`/assets/batch?ids=${ids.join(",")}`));
 }
 
 export function updateAsset(id: string, version: number, patch: Partial<Pick<Asset, "name" | "status" | "tags">>): Promise<Asset> {
-  return request<Asset>(`/api/assets/${id}`, {
+  return request<Asset>(withBase(`/assets/${id}`), {
     method: "PATCH",
     body: JSON.stringify({ version, patch }),
   });
@@ -87,10 +93,10 @@ export function updateAsset(id: string, version: number, patch: Partial<Pick<Ass
 
 export function bulkSetStatus(ids: string[], status: Asset["status"]): Promise<BulkResult> {
   // Note: the endpoint rejects more than 50 ids per call.
-  return request<BulkResult>("/api/assets/bulk-status", {
+  return request<BulkResult>(withBase("/assets/bulk-status"), {
     method: "POST",
     body: JSON.stringify({ ids, status }),
   });
 }
 
-export const thumbnailUrl = (id: string) => `/api/thumb/${id}.svg`;
+export const thumbnailUrl = (id: string) => withBase(`/thumb/${id}.svg`);
