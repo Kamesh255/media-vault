@@ -1,9 +1,13 @@
 import type { Asset, AssetPage, AssetQuery, BulkResult } from "@/lib/types";
 
-const API_BASE = import.meta.env.DEV ? "/api" : (import.meta.env.VITE_API_BASE_URL ?? "https://media-vault-gmuv.onrender.com");
+const RAW_API_BASE = import.meta.env.DEV ? "/api" : (import.meta.env.VITE_API_BASE_URL ?? "https://media-vault-gmuv.onrender.com/api");
+
+const API_BASE = RAW_API_BASE.replace(/\/$/, "");
+const NORMALIZED_API_BASE = /\/api$/i.test(API_BASE) ? API_BASE : `${API_BASE}/api`;
 
 function withBase(path: string): string {
-  return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const safePath = path.startsWith("/") ? path : `/${path}`;
+  return `${NORMALIZED_API_BASE}${safePath}`;
 }
 
 export class ApiError extends Error {
